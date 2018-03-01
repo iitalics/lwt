@@ -3187,6 +3187,17 @@ let cancel_join_tests = suite "cancel join" [
     Lwt.cancel p';
     Lwt.return (!ran = 1)
   end;
+
+  (* Rather than being a test of cancelation, this test exists mainly to
+     document that [Lwt.join []] is a promise that resolves immediately, so it
+     is not possible to cancel it. By comparison, [Lwt.choose] and related
+     functions evaluate to a pending promise when given the empty list, so there
+     is interesting cancelation behavior to test for them. *)
+  test "empty" begin fun () ->
+    let p = Lwt.join [] in
+    Lwt.cancel p;
+    Lwt.return (Lwt.state p = Lwt.Return ())
+  end;
 ]
 let suites = suites @ [cancel_join_tests]
 
@@ -3211,6 +3222,12 @@ let cancel_choose_tests = suite "cancel choose" [
       (Lwt.state p1 = Lwt.Sleep &&
        Lwt.state p2 = Lwt.Fail Lwt.Canceled &&
        Lwt.state p3 = Lwt.Fail Lwt.Canceled)
+  end;
+
+  test "empty" begin fun () ->
+    let p = Lwt.choose [] in
+    Lwt.cancel p;
+    Lwt.return (Lwt.state p = Lwt.Sleep)
   end;
 ]
 let suites = suites @ [cancel_choose_tests]
@@ -3237,6 +3254,12 @@ let cancel_pick_tests = suite "cancel pick" [
        Lwt.state p2 = Lwt.Fail Lwt.Canceled &&
        Lwt.state p3 = Lwt.Fail Lwt.Canceled)
   end;
+
+  test "empty" begin fun () ->
+    let p = Lwt.pick [] in
+    Lwt.cancel p;
+    Lwt.return (Lwt.state p = Lwt.Sleep)
+  end;
 ]
 let suites = suites @ [cancel_pick_tests]
 
@@ -3261,6 +3284,12 @@ let cancel_nchoose_tests = suite "cancel nchoose" [
       (Lwt.state p1 = Lwt.Sleep &&
        Lwt.state p2 = Lwt.Fail Lwt.Canceled &&
        Lwt.state p3 = Lwt.Fail Lwt.Canceled)
+  end;
+
+  test "empty" begin fun () ->
+    let p = Lwt.nchoose [] in
+    Lwt.cancel p;
+    Lwt.return (Lwt.state p = Lwt.Sleep)
   end;
 ]
 let suites = suites @ [cancel_nchoose_tests]
@@ -3287,6 +3316,12 @@ let cancel_npick_tests = suite "cancel npick" [
        Lwt.state p2 = Lwt.Fail Lwt.Canceled &&
        Lwt.state p3 = Lwt.Fail Lwt.Canceled)
   end;
+
+  test "empty" begin fun () ->
+    let p = Lwt.npick [] in
+    Lwt.cancel p;
+    Lwt.return (Lwt.state p = Lwt.Sleep)
+  end;
 ]
 let suites = suites @ [cancel_npick_tests]
 
@@ -3311,6 +3346,12 @@ let cancel_nchoose_split_tests = suite "cancel nchoose_split" [
       (Lwt.state p1 = Lwt.Sleep &&
        Lwt.state p2 = Lwt.Fail Lwt.Canceled &&
        Lwt.state p3 = Lwt.Fail Lwt.Canceled)
+  end;
+
+  test "empty" begin fun () ->
+    let p = Lwt.nchoose_split [] in
+    Lwt.cancel p;
+    Lwt.return (Lwt.state p = Lwt.Sleep)
   end;
 ]
 let suites = suites @ [cancel_nchoose_split_tests]
